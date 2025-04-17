@@ -29,7 +29,7 @@ const templateFeatures = {
 
 // --- Function to Load Features from Cache ---
 async function loadFeaturesFromCache(equipmentType) {
-  if (!cv) throw new Error("OpenCV not initialized before loading cache");
+  // if (!cv) throw new Error("OpenCV not initialized before loading cache");
 
   // LAZY LOADING CHECK: If features for this type are already loaded, skip.
   // Basic check: assumes an empty object means not loaded.
@@ -43,7 +43,7 @@ async function loadFeaturesFromCache(equipmentType) {
       templateFeatures[equipmentType] = {};
   }
 
-  const cacheFileName = `${equipmentType.replace('/', '-')}_features.json`;
+  const cacheFileName = `${equipmentType}_features.json`;
   const cacheFilePath = path.join(cacheDir, cacheFileName);
 
   console.log(`LAZY LOADING cache for ${equipmentType} from: ${cacheFilePath}`);
@@ -104,7 +104,7 @@ async function loadFeaturesFromCache(equipmentType) {
 
 // --- Deserialization Logic ---
 // once initialized, don't delete the mat
-async function deserializeDescriptors(base64Content) {
+function deserializeDescriptors(base64Content) {
   try {
     const buffer = Buffer.from(base64Content, 'base64');
     const descriptorSize = 32; // ORB descriptors are 32 bytes
@@ -127,10 +127,17 @@ async function deserializeDescriptors(base64Content) {
   }
 }
 
-
 // --- Matching Logic (now async for lazy loading) ---
+/**
+ * Match equipment descriptors against templates
+ * @param {cv.Mat} queryDescriptors - OpenCV Mat containing query descriptors
+ * @param {string} equipmentType - Type of equipment to match against (e.g. "weapon/main")
+ * @param {number} threshold - Matching threshold value (default: 10)
+ * @param {number} top_n - Number of top matches to return (default: 3)
+ * @returns {Promise<Array>} Array of matched equipment with scores
+ */
 async function matchEquipment(queryDescriptors, equipmentType, threshold = 10, top_n = 3) {
-  const bfMatcher = new cv.BFMatcher(cv.NORM_HAMMING, true);
+  const bfMatcher = new cv.BFMatcher();
 
   // --- LAZY LOADING TRIGGER ---
   // Check if features for this type exist and are loaded
@@ -203,7 +210,7 @@ async function matchEquipment(queryDescriptors, equipmentType, threshold = 10, t
         matches.push({ id: templateName, confidence: goodMatchesCount });
       }
     } catch (error) {
-        console.error(`Error matching against template "${templateName}":`, error);
+        console.error(`Error matching against template "${templateName}"`);
     } finally {
         if (knnMatches && knnMatches.delete) {
             try { knnMatches.delete(); } catch (e) { console.error("Error deleting knnMatches:", e); }
@@ -235,14 +242,13 @@ async function handleDetectRequest(req, res, equipmentType) {
     if (orbDescriptors.contents.length === 0) {
       return res.json(results);
     }
-    console.log("length of contents", orbDescriptors.contents.length);
+
+    let queryDes = null;
 
     // Process descriptors sequentially because matchEquipment might trigger loading
     for (const content of orbDescriptors.contents) {
       try {
-        console.log("begin deserializeDescriptors");
-        const queryDes = await deserializeDescriptors(content);
-        console.log("begin matchEquipment");
+        queryDes = deserializeDescriptors(content);
         // Use await because matchEquipment is now async
         const topMatches = await matchEquipment(queryDes, equipmentType);
         results.push(topMatches);
