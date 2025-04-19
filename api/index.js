@@ -20,6 +20,8 @@ const app = express();
 // Parse JSON bodies (increased limit for potentially large base64 strings)
 app.use(express.json({ limit: '10mb' }));
 app.use(cors());
+// Allow all origins for preflight requests
+app.options("*", cors());
 
 
 const CACHE_DIR = process.env.CACHE_DIR;
