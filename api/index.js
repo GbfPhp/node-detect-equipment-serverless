@@ -21,7 +21,7 @@ const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(cors());
 // Allow all origins for preflight requests
-app.options('/v1/detect/*equipmentType', cors());
+app.options('*name', cors());
 
 
 const CACHE_DIR = process.env.CACHE_DIR;
@@ -243,6 +243,7 @@ async function matchEquipment(queryDescriptors, equipmentType, threshold = 10, t
 
 // --- Main Detection Handler (now handles async matchEquipment) ---
 async function handleDetectRequest(req, res, equipmentType) {
+  console.log("loading opencv");
   await loadOpenCv();
   console.log("handleDetectRequest", equipmentType);
 
