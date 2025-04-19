@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "nodemon src/dev.js",
-    "build": "esbuild src/app.js --bundle --minify --platform=node --outfile=dist/index.js"
+    "build-legacy": "esbuild src/app.js --bundle --minify --platform=node --outfile=api/index.js"
   },
   "author": "",
   "license": "ISC",

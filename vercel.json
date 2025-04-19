@@ -1,19 +1,7 @@
 {
     "version": 2,
-    "builds": [
-        {
-            "src": "dist/index.js",
-            "use": "@vercel/node"
-        }
-    ],
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "dist/index.js"
-        }
-    ],
     "functions": {
-        "dist/index.js": {
+        "api/index.js": {
             "includeFiles": "cache/**"
         }
     }

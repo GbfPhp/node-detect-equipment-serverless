@@ -1,4 +1,3 @@
-"use strict";
 const express = require('express');
 const fs = require('fs/promises'); // Import fs promises API
 const path = require('path'); // Import path module
