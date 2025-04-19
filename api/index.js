@@ -3,7 +3,7 @@ const fs = require('fs/promises'); // Import fs promises API
 const path = require('path'); // Import path module
 const cv = require("@techstark/opencv-js");
 const dotenv = require('dotenv');
-
+const cors = require('cors');
 async function loadOpenCv() {
   return new Promise((resolve) => {
     cv.onRuntimeInitialized = () => {
@@ -19,6 +19,7 @@ const app = express();
 
 // Parse JSON bodies (increased limit for potentially large base64 strings)
 app.use(express.json({ limit: '10mb' }));
+app.use(cors());
 
 
 const CACHE_DIR = process.env.CACHE_DIR;
