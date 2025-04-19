@@ -1,22 +1,22 @@
 "use strict";
-import express from 'express';
-import fs from 'fs/promises'; // Import fs promises API
-import path from 'path'; // Import path module
-import { fileURLToPath } from 'url'; // To get __dirname in ES modules
-import { getOpenCv } from "./opencv.mjs"; // Assuming opencv.mjs is in ./cv/
+const express = require('express');
+const fs = require('fs/promises'); // Import fs promises API
+const path = require('path'); // Import path module
+const cv = require("@techstark/opencv-js");
 
-// Get __dirname equivalent in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
-const port = process.env.PORT || 2580;
 
 // Parse JSON bodies (increased limit for potentially large base64 strings)
 app.use(express.json({ limit: '10mb' }));
 
+
+const CACHE_DIR = process.env.CACHE_DIR;
 // Define cache directory relative to the server file
-const cacheDir = path.join(__dirname, '../../grid-recognizer', 'cache', '_feature_cache'); // Adjust path as needed
+if (!CACHE_DIR) {
+  throw new Error("CACHE_DIR is not set");
+}
+const cacheDir = path.join(__dirname, CACHE_DIR);
 
 // Template Features object - will be populated lazily from cache
 const templateFeatures = {
@@ -282,10 +282,4 @@ app.get('/', (req, res) => {
   res.send('Server is running');
 });
 
-// --- Start Server ---
-// Initialize OpenCV first, then start the server
-const { cv } = await getOpenCv();
-
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-})
+module.exports = app;
