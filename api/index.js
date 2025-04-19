@@ -16,12 +16,13 @@ async function loadOpenCv() {
 dotenv.config();
 
 const app = express();
+app.use(cors());
+// Allow all origins for preflight requests
+app.options("*name", cors());
 
 // Parse JSON bodies (increased limit for potentially large base64 strings)
 app.use(express.json({ limit: '10mb' }));
-app.use(cors());
-// Allow all origins for preflight requests
-app.options('*name', cors());
+
 
 
 const CACHE_DIR = process.env.CACHE_DIR;
