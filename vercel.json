@@ -8,7 +8,7 @@
     ],
     "functions": {
         "api/index.js": {
-            "includeFiles": "cache/**",
+            "includeFiles": "api/cache/**",
             "maxDuration": 30
         }
     }
