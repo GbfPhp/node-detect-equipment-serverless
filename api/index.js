@@ -2,7 +2,9 @@ const express = require('express');
 const fs = require('fs/promises'); // Import fs promises API
 const path = require('path'); // Import path module
 const cv = require("@techstark/opencv-js");
+const dotenv = require('dotenv');
 
+dotenv.config();
 
 const app = express();
 
@@ -279,6 +281,10 @@ app.post("/v1/detect/chara", (req, res) => handleDetectRequest(req, res, "chara"
 // --- Basic health check endpoint ---
 app.get('/', (req, res) => {
   res.send('Server is running');
+});
+
+app.listen(2580, () => {
+  console.log(`Server listening on port 2580`);
 });
 
 module.exports = app;
