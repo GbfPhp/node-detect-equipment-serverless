@@ -21,7 +21,7 @@ const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(cors());
 // Allow all origins for preflight requests
-app.options("*", cors());
+app.options('/v1/detect/*equipmentType', cors());
 
 
 const CACHE_DIR = process.env.CACHE_DIR;
