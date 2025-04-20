@@ -17,6 +17,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 // Allow all origins for preflight requests
 // app.options("*", cors());
 
