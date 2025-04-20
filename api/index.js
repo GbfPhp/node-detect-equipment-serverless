@@ -18,12 +18,7 @@ dotenv.config();
 const app = express();
 app.use(cors());
 // Allow all origins for preflight requests
-app.options("*name", cors());
-
-// Parse JSON bodies (increased limit for potentially large base64 strings)
-app.use(express.json({ limit: '10mb' }));
-
-
+// app.options("*", cors());
 
 const CACHE_DIR = process.env.CACHE_DIR;
 // Define cache directory relative to the server file
@@ -296,10 +291,6 @@ app.post("/v1/detect/chara", (req, res) => handleDetectRequest(req, res, "chara"
 // --- Basic health check endpoint ---
 app.get('/', (req, res) => {
   res.send('Server is running');
-});
-
-app.listen(2580, () => {
-  console.log(`Server listening on port 2580`);
 });
 
 module.exports = app;
