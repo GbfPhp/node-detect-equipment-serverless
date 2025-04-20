@@ -246,7 +246,7 @@ async function handleDetectRequest(req, res, equipmentType) {
   try {
     const orbDescriptors = req.body;
     if (!orbDescriptors || !Array.isArray(orbDescriptors.contents)) {
-      return res.status(400).json({ error: "Invalid request body. Expecting { contents: [base64string] }" });
+      return res.status(400).json({ error: `Invalid request body. Expecting { contents: [base64string] } ${orbDescriptors}` });
     }
 
     const results = [];
