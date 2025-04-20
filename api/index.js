@@ -240,7 +240,7 @@ async function matchEquipment(queryDescriptors, equipmentType, threshold = 10, t
 // --- Main Detection Handler (now handles async matchEquipment) ---
 async function handleDetectRequest(req, res, equipmentType) {
   console.log("loading opencv");
-  await loadOpenCv();
+  // await loadOpenCv();
   console.log("handleDetectRequest", equipmentType);
 
   try {
