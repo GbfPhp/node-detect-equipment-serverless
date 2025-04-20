@@ -4,12 +4,27 @@ const path = require('path'); // Import path module
 const cv = require("@techstark/opencv-js");
 const dotenv = require('dotenv');
 const cors = require('cors');
-async function loadOpenCv() {
+
+let OPENCV_INITIALIZED = false;
+
+cv.onRuntimeInitialized = () => {
+  console.log("OpenCV.js is ready!");
+  OPENCV_INITIALIZED = true;
+};
+
+async function openCvLoaded() {
   return new Promise((resolve) => {
-    cv.onRuntimeInitialized = () => {
-      console.log("OpenCV.js is ready!");
+    if (OPENCV_INITIALIZED) {
       resolve();
-    };
+    } else {
+      for (let i = 0; i < 10; i++) {
+        setTimeout(() => {
+          if (OPENCV_INITIALIZED) {
+            resolve();
+          }
+        }, 1000);
+      }
+    }
   });
 }
 
@@ -241,7 +256,7 @@ async function matchEquipment(queryDescriptors, equipmentType, threshold = 10, t
 // --- Main Detection Handler (now handles async matchEquipment) ---
 async function handleDetectRequest(req, res, equipmentType) {
   console.log("loading opencv");
-  // await loadOpenCv();
+  await openCvLoaded();
   console.log("handleDetectRequest", equipmentType);
 
   try {
