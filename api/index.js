@@ -301,6 +301,8 @@ app.post("/v1/detect/summon/party_main", (req, res) => handleDetectRequest(req, 
 app.post("/v1/detect/summon/party_sub", (req, res) => handleDetectRequest(req, res, "summon/party_sub"));
 app.post("/v1/detect/weapon/main", (req, res) => handleDetectRequest(req, res, "weapon/main"));
 app.post("/v1/detect/weapon/normal", (req, res) => handleDetectRequest(req, res, "weapon/normal"));
+app.post("/v1/detect/priority/weapon/main", (req, res) => handleDetectRequest(req, res, "priority/weapon/main"));
+app.post("/v1/detect/priority/weapon/normal", (req, res) => handleDetectRequest(req, res, "priority/weapon/normal"));
 app.post("/v1/detect/chara", (req, res) => handleDetectRequest(req, res, "chara"));
 
 
