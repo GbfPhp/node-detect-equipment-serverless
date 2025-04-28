@@ -161,7 +161,7 @@ function deserializeDescriptors(base64Content) {
  * @param {number} top_n - Number of top matches to return (default: 3)
  * @returns {Promise<Array>} Array of matched equipment with scores
  */
-async function matchEquipment(queryDescriptors, equipmentType, threshold = 10, top_n = 3) {
+async function matchEquipment(queryDescriptors, equipmentType, threshold = 10, top_n = 3, earlyReturn = false) {
   const bfMatcher = new cv.BFMatcher();
 
   // --- LAZY LOADING TRIGGER ---
@@ -233,6 +233,9 @@ async function matchEquipment(queryDescriptors, equipmentType, threshold = 10, t
 
       if (goodMatchesCount >= threshold) {
         matches.push({ id: templateName, confidence: goodMatchesCount });
+        if (earlyReturn) {
+          break
+        }
       }
     } catch (error) {
         console.error(`Error matching against template "${templateName}"`);
@@ -260,24 +263,26 @@ async function handleDetectRequest(req, res, equipmentType) {
   console.log("handleDetectRequest", equipmentType);
 
   try {
-    const orbDescriptors = req.body;
-    if (!orbDescriptors || !Array.isArray(orbDescriptors.contents)) {
-      return res.status(400).json({ error: `Invalid request body. Expecting { contents: [base64string] } ${orbDescriptors}` });
+    const reqBody = req.body;
+    if (!reqBody || !Array.isArray(reqBody.contents)) {
+      return res.status(400).json({ error: `Invalid request body. Expecting { contents: [base64string] } ${reqBody}` });
     }
 
+    const earlyReturn = reqBody.earlyReturn === "true";
+
     const results = [];
-    if (orbDescriptors.contents.length === 0) {
+    if (reqBody.contents.length === 0) {
       return res.json(results);
     }
 
     let queryDes = null;
 
     // Process descriptors sequentially because matchEquipment might trigger loading
-    for (const content of orbDescriptors.contents) {
+    for (const content of reqBody.contents) {
       try {
         queryDes = deserializeDescriptors(content);
         // Use await because matchEquipment is now async
-        const topMatches = await matchEquipment(queryDes, equipmentType);
+        const topMatches = await matchEquipment(queryDes, equipmentType, 10, 3, earlyReturn);
         results.push(topMatches);
       } catch (error) {
           console.error(`Error processing descriptor content for type ${equipmentType}:`, error);
